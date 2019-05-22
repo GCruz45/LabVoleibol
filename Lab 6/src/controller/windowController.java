@@ -1,21 +1,30 @@
 package controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import model.Participant;
-import model.Spectator;
 import model.Tournament;
+
+import java.io.File;
 
 public class windowController {
 
-    Tournament tournament = new Tournament();
+    Tournament tournament;
+    FileChooser chooser;
+    File file;
 
-    public windowController(){
-        tournament.loadSpectators();
+    public void initialize() {
+        tournament = new Tournament();
+        chooser = new FileChooser();
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
+        chooser.setInitialDirectory(new File("./src/data"));
+        file = new File("./");
     }
 
     @FXML
@@ -69,17 +78,22 @@ public class windowController {
     @FXML
     private Button paintSpectatorsButton;
 
-    private void searchFile() {
-
+    @FXML
+    private void loadFile() {
+        tournament.loadSpectators(filePathTextBox.getText());
+        tournament.selectParticipants(tournament.getFirstSpectator());
     }
 
-    private void loadFile() {
-
+    @FXML
+    void searchFile() {
+        file = chooser.showOpenDialog(null);
+        filePathTextBox.setText(file.toString());
     }
 
     @FXML
     private void searchParticipant() {
         Participant participant;
+        System.out.println(tournament.getFirstParticipant().getName());
         participant = tournament.searchParticipant(Integer.valueOf(participantId.getText()), tournament.getFirstParticipant());
 
         if (participant == null) {

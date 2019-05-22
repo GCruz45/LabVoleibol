@@ -7,26 +7,26 @@ import java.util.Random;
 
 public class Tournament {
 
-
     private Participant firstParticipant;
     private Spectator firstSpectator;
 
-
-    public void loadSpectators() {
+    public void loadSpectators(String filePath) {
 
         try {
-            FileReader spectatorsFile = new FileReader("data/participants.csv");
+            FileReader spectatorsFile = new FileReader(filePath);
             BufferedReader reader = new BufferedReader(spectatorsFile);
             String line;
             String[] splitLine;
-
             line = reader.readLine();
             splitLine = line.split(",");
             firstSpectator = new Spectator(splitLine[0], splitLine[1], splitLine[2], splitLine[3],
                     splitLine[4], splitLine[5], splitLine[6], splitLine[7]);
 
-            while (reader.readLine() != null) {
+            while (line != null) {
                 line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
                 splitLine = line.split(",");
                 Spectator newSpectator = new Spectator(splitLine[0], splitLine[1], splitLine[2], splitLine[3],
                         splitLine[4], splitLine[5], splitLine[6], splitLine[7]);
@@ -87,19 +87,29 @@ public class Tournament {
 
     public void selectParticipants(Spectator currentRoot) {//Selects spectators from the tree and loads them into a new linked list
         Random rng = new Random();
-        if (rng.nextInt(1) == 1) {
-            if (firstParticipant == null) {
+
+        if (firstParticipant == null) {
+            if (rng.nextInt(1) == 1) {
                 firstParticipant = new Participant(currentRoot);
-            } else {
+            }
+            if (currentRoot.getLeftSpectator() != null) {
+                selectParticipants(currentRoot.getLeftSpectator());
+            }
+            if (currentRoot.getRightSpectator() != null) {
+                selectParticipants(currentRoot.getRightSpectator());
+            }
+        } else {
+            if (rng.nextInt(1) == 1) {
                 insertParticipant(new Participant(currentRoot));
-                if (currentRoot.getLeftSpectator() != null) {
-                    selectParticipants(currentRoot.getLeftSpectator());
-                }
-                if (currentRoot.getRightSpectator() != null) {
-                    selectParticipants(currentRoot.getRightSpectator());
-                }
+            }
+            if (currentRoot.getLeftSpectator() != null) {
+                selectParticipants(currentRoot.getLeftSpectator());
+            }
+            if (currentRoot.getRightSpectator() != null) {
+                selectParticipants(currentRoot.getRightSpectator());
             }
         }
+
     }
 
     public Spectator searchSpectator(int id, Spectator currentRoot) {
